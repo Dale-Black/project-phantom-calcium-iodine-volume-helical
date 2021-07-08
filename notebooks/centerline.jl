@@ -133,6 +133,18 @@ end;
 # ╔═╡ 117a46fc-ddd8-4424-8bf9-603a615e4715
 NIfTI.orientation(lbl)
 
+# ╔═╡ 3a49eb3b-ed1b-410f-b370-f20345a266c9
+label_path2 = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 1^275\HEL_SLICER_SEG_60\135\M_3.0.nii"
+
+# ╔═╡ 58764406-9002-4ce6-85d8-06a414efdac2
+begin
+	lbl2 = niread(label_path2)
+	lbl_array2 = copy(lbl2.raw)
+end;
+
+# ╔═╡ 0cb8b172-3750-4039-9cc7-05dab78dea06
+NIfTI.orientation(lbl2)
+
 # ╔═╡ c0c06f88-0a7a-44fb-b004-badd43babfd2
 md"""
 ## Load DICOM
@@ -270,6 +282,9 @@ CSV.write(save_path, df)
 # ╠═58f7df01-98c8-4f32-a5c9-32ae256ec10d
 # ╠═b43e68d5-6495-431d-ac7e-85f2e34ca981
 # ╠═117a46fc-ddd8-4424-8bf9-603a615e4715
+# ╠═3a49eb3b-ed1b-410f-b370-f20345a266c9
+# ╠═58764406-9002-4ce6-85d8-06a414efdac2
+# ╠═0cb8b172-3750-4039-9cc7-05dab78dea06
 # ╟─c0c06f88-0a7a-44fb-b004-badd43babfd2
 # ╟─2a4f14fe-9221-4233-b9da-fc9e1627d65b
 # ╠═9d079413-2408-4029-9b0a-47422003bbe6
