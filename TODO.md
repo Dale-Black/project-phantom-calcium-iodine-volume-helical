@@ -13,3 +13,5 @@
         * 120 kV
         * 135 kV
 - [ ] Create a mass measurement notebook
+  * Large
+  * Small
