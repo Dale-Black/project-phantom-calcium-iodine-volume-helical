@@ -119,10 +119,10 @@ md"""
 """
 
 # ╔═╡ a0021625-29b6-4b09-a137-2b8f3948e5a7
-image_path = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 1^275\52\HR60KV135SEGMENT";
+image_path = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 1^275\52\HR80KV120SEGMENT";
 
 # ╔═╡ 58f7df01-98c8-4f32-a5c9-32ae256ec10d
-label_path = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 1^275\HEL_SLICER_SEG_60\135\L_5.0.nii";
+label_path = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 1^275\HEL_SLICER_SEG_80\120\S_1.2.nii";
 
 # ╔═╡ b43e68d5-6495-431d-ac7e-85f2e34ca981
 begin
@@ -130,20 +130,11 @@ begin
 	lbl_array = copy(lbl.raw)
 end;
 
+# ╔═╡ afc4de79-db18-4289-b4cb-e7498f5e6d68
+unique(lbl_array)
+
 # ╔═╡ 117a46fc-ddd8-4424-8bf9-603a615e4715
 NIfTI.orientation(lbl)
-
-# ╔═╡ 3a49eb3b-ed1b-410f-b370-f20345a266c9
-label_path2 = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 1^275\HEL_SLICER_SEG_60\135\M_3.0.nii"
-
-# ╔═╡ 58764406-9002-4ce6-85d8-06a414efdac2
-begin
-	lbl2 = niread(label_path2)
-	lbl_array2 = copy(lbl2.raw)
-end;
-
-# ╔═╡ 0cb8b172-3750-4039-9cc7-05dab78dea06
-NIfTI.orientation(lbl2)
 
 # ╔═╡ c0c06f88-0a7a-44fb-b004-badd43babfd2
 md"""
@@ -232,7 +223,7 @@ indices = findall(x -> x == zs[l], center_arr[:,3])
 # ╔═╡ e935f1f6-c0e1-443a-9cc6-56217512eac0
 begin
 	plt2a = Plots.scatter(center_arr[:,1][indices], center_arr[:,2][indices], color="red", markersize=7)
-	Plots.heatmap!(plt2a, transpose(lbl_array[:,:,zs[l]]), size=(5000, 5000), alpha=0.5, color=:grays)
+	Plots.heatmap!(plt2a, transpose(lbl_array[:,:,zs[l]]), size=(7500, 5000), alpha=0.5, color=:grays)
 end
 
 # ╔═╡ 42d896a2-13b3-4895-81c7-cdfaa0cb4f33
@@ -255,7 +246,7 @@ cols = ["x", "y", "z"]
 df = DataFrame(center_arr, cols)
 
 # ╔═╡ a94013f3-e496-4f8e-b9ac-0675995db8bd
-save_path = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 1^275\HEL_SLICER_SEG_60\135\L_5.0_centerpoints.csv"
+save_path = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 1^275\HEL_SLICER_SEG_80\120\S_1.2_centerpoints.csv"
 
 # ╔═╡ 9cdbf130-4d01-40f9-8f6b-ef8f18203922
 CSV.write(save_path, df)
@@ -281,14 +272,12 @@ CSV.write(save_path, df)
 # ╠═a0021625-29b6-4b09-a137-2b8f3948e5a7
 # ╠═58f7df01-98c8-4f32-a5c9-32ae256ec10d
 # ╠═b43e68d5-6495-431d-ac7e-85f2e34ca981
+# ╠═afc4de79-db18-4289-b4cb-e7498f5e6d68
 # ╠═117a46fc-ddd8-4424-8bf9-603a615e4715
-# ╠═3a49eb3b-ed1b-410f-b370-f20345a266c9
-# ╠═58764406-9002-4ce6-85d8-06a414efdac2
-# ╠═0cb8b172-3750-4039-9cc7-05dab78dea06
 # ╟─c0c06f88-0a7a-44fb-b004-badd43babfd2
 # ╟─2a4f14fe-9221-4233-b9da-fc9e1627d65b
 # ╠═9d079413-2408-4029-9b0a-47422003bbe6
-# ╠═12e160f6-7bde-491c-90ef-caafbb9807a4
+# ╟─12e160f6-7bde-491c-90ef-caafbb9807a4
 # ╠═769fe808-1951-4fc0-840d-11cf9b9e10b6
 # ╠═2de0a71a-357a-48da-a15b-d991a737f390
 # ╟─38b7d31b-38b7-4c69-8851-bfb4f1c6256e
