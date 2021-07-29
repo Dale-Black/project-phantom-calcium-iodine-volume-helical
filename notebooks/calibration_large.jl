@@ -142,6 +142,90 @@ begin
 	img_array2 = permutedims(img_array2, (2, 1, 3))
 end;
 
+# ╔═╡ 05d69d6e-f047-470a-92f4-550a01fd374f
+md"""
+### 120 kV
+"""
+
+# ╔═╡ 00ee0012-f44e-466c-a68e-0c5380436dd8
+image_path3 = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 1^275\49\120.0";
+
+# ╔═╡ b35e2b93-3a51-4190-be31-3e56228ac223
+label_path3 = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 1^275\HEL_SLICER_SEG_0\120\L_5.0.nii";
+
+# ╔═╡ dfcdce5a-ab4f-4252-b0e2-dcd0106d011e
+begin
+	lbl_3 = niread(label_path3)
+	lbl_array3 = copy(lbl_3.raw)
+end;
+
+# ╔═╡ 7cd71526-ab9c-4488-ba02-65b56368ddb5
+NIfTI.orientation(lbl_3)
+
+# ╔═╡ dcf6b2cc-72c7-4322-b0ef-764d8a7590eb
+img_3 = dcmdir_parse(image_path3);
+
+# ╔═╡ eece5f5b-c75b-465c-b731-395daa0f4c3e
+md"""
+#### Reorient DICOM
+"""
+
+# ╔═╡ 34f93dee-d7dc-44e2-8c78-172e20620513
+begin
+	aff3 = get_affine(img_3)
+	io3 = io_orientation(aff3)
+	ornt2axcodes(io3)
+end
+
+# ╔═╡ 71b2bc03-ae83-4169-a26e-35addcb64770
+begin
+	img_array3 = load_dcm_array(img_3)
+	img_array3, affvol3, new_affvol3 = DICOMUtils.orientation(img_array3, orient)
+	img_array3 = permutedims(img_array3, (2, 1, 3))
+end;
+
+# ╔═╡ cf85c203-79f3-488b-965e-0a0b2d44a4c6
+md"""
+### 135 kV
+"""
+
+# ╔═╡ e114ac6a-375b-4f29-85ab-fe917f67137d
+image_path4 = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 1^275\49\135.0";
+
+# ╔═╡ a55e0a76-9fd2-4793-8c5a-342d1289cad3
+label_path4 = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 1^275\HEL_SLICER_SEG_0\135\L_5.0.nii";
+
+# ╔═╡ 95447658-665d-474e-ae94-ef8fb85841c6
+begin
+	lbl_4 = niread(label_path4)
+	lbl_array4 = copy(lbl_4.raw)
+end;
+
+# ╔═╡ 7a6e47fc-5a9a-42a4-bb4b-6e0cc8ad10fd
+NIfTI.orientation(lbl_4)
+
+# ╔═╡ 94f63f2c-e1ca-4b9f-b65b-ab1066058e6d
+img_4 = dcmdir_parse(image_path4);
+
+# ╔═╡ 97f03f4c-c0fe-4238-a1d8-6045da32a387
+md"""
+#### Reorient DICOM
+"""
+
+# ╔═╡ 9e07bafa-6284-4dc5-8279-abbdc33ea706
+begin
+	aff4 = get_affine(img_4)
+	io4 = io_orientation(aff4)
+	ornt2axcodes(io4)
+end
+
+# ╔═╡ f6afb134-3622-42cd-9a2e-1edda84cb4a9
+begin
+	img_array4 = load_dcm_array(img_4)
+	img_array4, affvol4, new_affvol4 = DICOMUtils.orientation(img_array4, orient)
+	img_array4 = permutedims(img_array4, (2, 1, 3))
+end;
+		
 # ╔═╡ 3e804f4b-3b7d-47ac-ab58-0d3ba8662884
 md"""
 ### Visualize images and labels
@@ -162,24 +246,32 @@ end
 begin
 	l_indices = findall(x -> x == 1.0, lbl_array)
 	l_indices2 = findall(x -> x == 1.0, lbl_array2)
+	l_indices3 = findall(x -> x == 1.0, lbl_array3)
+	l_indices4 = findall(x -> x == 1.0, lbl_array4)
 end;
 
 # ╔═╡ 5158b66a-9624-4cc1-aee9-bae91cc68c11
 begin
 	li = Tuple.(l_indices)
 	li2 = Tuple.(l_indices2)
+	li3 = Tuple.(l_indices3)
+	li4 = Tuple.(l_indices4)
 end;
 
 # ╔═╡ 766b6bff-2244-4577-874a-f4d640f4f321
 begin
 	label_arr = collect_tuple(li)
 	label_arr2 = collect_tuple(li2)
+	label_arr3 = collect_tuple(li3)
+	label_arr4 = collect_tuple(li4)
 end;
 
 # ╔═╡ ea4c93e9-80eb-4e6e-8dd3-6bc675698da0
 begin
 	zs_l = unique(label_arr[:,3])
 	zs_l2 = unique(label_arr2[:,3])
+	zs_l3 = unique(label_arr3[:,3])
+	zs_l4 = unique(label_arr4[:,3])
 end;
 
 # ╔═╡ caa4ed3d-47e5-4030-bb9f-0d70f791f348
@@ -187,11 +279,19 @@ end;
 
 # ╔═╡ a51aea16-bc50-4343-96d0-bba3e4333c11
 @bind r PlutoUI.Slider(1:length(zs_l2), default=10, show_value=true)
+				
+# ╔═╡ 6569882f-5b2f-49a8-8a5d-6c7393ccd0a5
+@bind p PlutoUI.Slider(1:length(zs_l3), default=10, show_value=true)
+				
+# ╔═╡ 9bee18ff-caaf-44b3-87c1-7c5653bc9cf2
+@bind t PlutoUI.Slider(1:length(zs_l4), default=10, show_value=true)
 
 # ╔═╡ 291bd287-2d82-4e1f-8325-66b7111b6b2f
 begin
 	indices_l = findall(x -> x == zs_l[q], label_arr[:,3])
 	indices_l2 = findall(x -> x == zs_l2[r], label_arr2[:,3])
+	indices_l3 = findall(x -> x == zs_l3[p], label_arr3[:,3])
+	indices_l4 = findall(x -> x == zs_l4[t], label_arr4[:,3])
 end;
 
 # ╔═╡ b4593c55-e98f-4357-b874-fb8dfa570e5c
@@ -214,6 +314,26 @@ begin
 	fig2
 end
 
+# ╔═╡ ea9667ae-8c0f-4452-aa0d-7aa165188e45
+begin
+	fig3 = Figure()
+	ax_3 = Makie.Axis(fig3[1, 1])
+	ax_3.title = "Large Insert (120 kV)"
+	heatmap!(ax_3, img_array3[:,:,zs_l3[p]], colormap=:grays)
+	scatter!(ax_3, label_arr3[:,1][indices_l3], label_arr3[:,2][indices_l3], markersize=1, color=:red)
+	fig3
+end
+
+# ╔═╡ c32314ad-ba7e-493f-87b6-b99df64ee2fb
+begin
+	fig4 = Figure()
+	ax_4 = Makie.Axis(fig4[1, 1])
+	ax_4.title = "Large Insert (135 kV)"
+	heatmap!(ax_4, img_array3[:,:,zs_l4[t]], colormap=:grays)
+	scatter!(ax_4, label_arr4[:,1][indices_l4], label_arr4[:,2][indices_l4], markersize=1, color=:red)
+	fig4
+end
+				
 # ╔═╡ 3cb21e2c-07e4-4e07-8331-5a0d48889072
 md"""
 ## Calibrate
@@ -233,6 +353,14 @@ begin
 	# 100 kV
 	ring2 = Bool.(dilate(lbl_array2) - lbl_array2)
 	S_BG2 = mean(img_array2[ring2])
+					
+	# 120 kV
+	ring3 = Bool.(dilate(lbl_array3) - lbl_array3)
+	S_BG3 = mean(img_array[ring3])
+	
+	# 135 kV
+	ring4 = Bool.(dilate(lbl_array4) - lbl_array4)
+	S_BG4 = mean(img_array[ring4])
 end
 
 # ╔═╡ bad81568-5edc-4821-a0cb-6833f911ac0b
@@ -251,6 +379,16 @@ begin
 	core2 = Bool.(erode(lbl_array2))
 	core2 = erode(core2)
 	S_O2 = mean(img_array2[core2])
+					
+	# 120 kV
+	core3 = Bool.(erode(lbl_array3))
+	core3 = erode(core3)
+	S_O3 = mean(img_array[core3])
+	
+	# 135 kV
+	core4 = Bool.(erode(lbl_array4))
+	core4 = erode(core4)
+	S_O4 = mean(img_array[core4])
 end
 
 # ╔═╡ 9d56d1bf-171d-4e66-a0f3-f610dfde9edd
@@ -290,13 +428,45 @@ begin
 	f2
 end
 
+# ╔═╡ 42507e36-011e-41a8-ae52-02cbf99e92d4
+@bind d PlutoUI.Slider(1:size(lbl_array3)[3]; default=215, show_value=true)
+
+# ╔═╡ 8d7204c0-eb12-4c4f-9cac-a9826b4a5ec0
+begin
+	f3 = Figure()
+	ax1_3 = Makie.Axis(f3[1, 1])
+	ax1_3.title = "Ring 120 kV (S_BG)"
+	heatmap!(ax1_3, ring3[:, :, d])
+	
+	ax2_3 = Makie.Axis(f3[1, 2])
+	ax2_3.title = "Core 120 kV (S_O)"
+	heatmap!(ax2_3, core3[:, :, d])
+	f3
+end
+
+# ╔═╡ 83b7bcdb-4521-4089-8239-26106ef97daa
+@bind e PlutoUI.Slider(1:size(lbl_array4)[3]; default=215, show_value=true)
+
+# ╔═╡ 8c330b9f-881e-4b41-82a2-db85c646bafd
+begin
+	f4 = Figure()
+	ax1_4 = Makie.Axis(f4[1, 1])
+	ax1_4.title = "Ring 135 kV (S_BG)"
+	heatmap!(ax1_4, ring4[:, :, e])
+	
+	ax2_4 = Makie.Axis(f4[1, 2])
+	ax2_4.title = "Core 135 kV (S_O)"
+	heatmap!(ax2_4, core4[:, :, e])
+	f4
+end
+				
 # ╔═╡ 6e52d101-f7ac-4063-8e69-4562854639dc
 md"""
 ## Optional: Save as CSV/Excel file
 """
 
 # ╔═╡ f21103e4-f3ad-44ac-b877-4c95e8000a72
-S_BGs, S_Os = [S_BG, S_BG2], [S_O, S_O2]
+S_BGs, S_Os = [S_BG, S_BG2, S_BG3, S_BG4], [S_O, S_O2, S_O3, S_O4]
 
 # ╔═╡ 5ef0ed13-59d6-44cb-949f-e92e26a7662b
 df = DataFrame(S_BGs = S_BGs, S_Os = S_Os)
