@@ -241,7 +241,10 @@ df = DataFrame(ground_truth_mass = gt_m_Ca, calcium_mass = masses)
 # save_path = ".."
 
 # ╔═╡ 132fe985-9b67-47f2-a7a8-949f30a9cc26
-# CSV.write(save_path, df)
+# CSV.write(save_path, df) UPDATE
+
+# ╔═╡ c155eca3-fbce-42a1-b71c-458c17d2f767
+
 
 # ╔═╡ Cell order:
 # ╠═6f16e0ec-eb29-11eb-37bd-6fd61abf4218
@@ -276,3 +279,4 @@ df = DataFrame(ground_truth_mass = gt_m_Ca, calcium_mass = masses)
 # ╠═55ee2d9c-d699-48d2-a414-36650f1868e3
 # ╠═ac220b8c-3378-4e5f-b599-ee4778f6a7e3
 # ╠═132fe985-9b67-47f2-a7a8-949f30a9cc26
+# ╠═c155eca3-fbce-42a1-b71c-458c17d2f767
