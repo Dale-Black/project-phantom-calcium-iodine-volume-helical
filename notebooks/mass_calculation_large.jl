@@ -101,7 +101,7 @@ begin
 end;
 
 # ╔═╡ 9c4d2d64-7637-4d31-b857-7c34f6596b6d
-orient = (("R", "P", "I"))
+orient = ("R", "P", "I")
 
 # ╔═╡ 7bc37e36-e9c2-4d65-add6-8ed298be4204
 begin
@@ -167,6 +167,14 @@ begin
 	num_voxels_tot2 = length(voxel_mask2)
 	
 	num_voxels_obj2 = num_voxels(I2, num_voxels_tot2, S_BG2, S_O2)
+	
+# 	# 120 kV
+# 	# erode label and use as mask for image
+# 	voxel_mask3 = img_array3[Bool.(erode(lbl_array3))]
+# 	I3 = sum(voxel_mask3)
+# 	num_voxels_tot3 = length(voxel_mask3)
+	
+# 	num_voxels_obj3 = num_voxels(I3, num_voxels_tot3, S_BG3, S_O3)
 end;
 
 # ╔═╡ 1cf5bedc-dad0-474a-a4a6-e46fca551fde
