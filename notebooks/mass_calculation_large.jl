@@ -50,6 +50,8 @@ These values come from the calibration_large.jl notebook
 begin
 	S_BG, S_O = -125.937, 65.5397
 	S_BG2, S_O2 = -67.4193, 71.858
+	S_BG3, S_O3 = -117.324, 72.6583
+	S_BG4, S_O4 = -130.36,	78.2884	
 end;
 
 # ╔═╡ 48a0715a-bccb-4270-9bd3-f1ec633a19bc
@@ -75,6 +77,9 @@ begin
 	
 	# 120 kV
 	image_path3 = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 1^275\49\120.0"
+	
+	# 135 kV
+	image_path4 = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 1^275\49\135.0"
 end;
 
 # ╔═╡ 83f34417-0a1c-4228-8026-2b9cf80889d4
@@ -84,6 +89,12 @@ begin
 	
 	# 100 kV
 	label_path2 = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 1^275\HEL_SLICER_SEG_0\100\L_5.0.nii"
+	
+	# 120 kV
+	label_path3 = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 1^275\HEL_SLICER_SEG_0\120\L_5.0.nii"
+	
+	# 135 kV
+	label_path4 = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 1^275\HEL_SLICER_SEG_0\135\L_5.0.nii"
 end;
 
 # ╔═╡ 63cdb8fd-80a2-49b9-b9c1-22cfcad8f15c
@@ -95,12 +106,22 @@ begin
 	# 100 kV
 	lbl2 = niread(label_path2)
 	lbl_array2 = copy(lbl2.raw)
+	
+	# 120 kV
+	lbl_3 = niread(label_path3)
+	lbl_array3 = copy(lbl_3.raw)	
+	
+	# 135 kv
+	lbl_4 = niread(label_path4)
+	lbl_array4 = copy(lbl_4.raw)	
 end;
 
 # ╔═╡ 0377236e-05c8-4914-8086-9fec7fbbcf5f
 begin
 	img = dcmdir_parse(image_path)
 	img2 = dcmdir_parse(image_path2)
+	img3 = dcmdir_parse(image_path3)
+	img4 = dcmdir_parse(image_path4)
 end;
 
 # ╔═╡ 9c4d2d64-7637-4d31-b857-7c34f6596b6d
@@ -115,6 +136,14 @@ begin
 	img_array2 = load_dcm_array(img2)
 	img_array2, affvol2, new_affvol2 = DICOMUtils.orientation(img_array2, orient)
 	img_array2 = permutedims(img_array2, (2, 1, 3))
+		
+	img_array3 = load_dcm_array(img3)
+	img_array3, affvol3, new_affvol3 = DICOMUtils.orientation(img_array3, orient)
+	img_array3 = permutedims(img_array3, (2, 1, 3))
+	
+	img_array4 = load_dcm_array(img4)
+	img_array4, affvol4, new_affvol4 = DICOMUtils.orientation(img_array4, orient)
+	img_array4 = permutedims(img_array4, (2, 1, 3))
 end;
 
 # ╔═╡ de3c29ef-92c1-4913-b77e-cd0037ea83ed
@@ -171,13 +200,21 @@ begin
 	
 	num_voxels_obj2 = num_voxels(I2, num_voxels_tot2, S_BG2, S_O2)
 	
-# 	# 120 kV
-# 	# erode label and use as mask for image
-# 	voxel_mask3 = img_array3[Bool.(erode(lbl_array3))]
-# 	I3 = sum(voxel_mask3)
-# 	num_voxels_tot3 = length(voxel_mask3)
+ 	# 120 kV
+ 	# erode label and use as mask for image
+ 	voxel_mask3 = img_array3[Bool.(erode(lbl_array3))]
+ 	I3 = sum(voxel_mask3)
+ 	num_voxels_tot3 = length(voxel_mask3)
 	
-# 	num_voxels_obj3 = num_voxels(I3, num_voxels_tot3, S_BG3, S_O3)
+ 	num_voxels_obj3 = num_voxels(I3, num_voxels_tot3, S_BG3, S_O3)
+		
+	# 135 kV
+ 	# erode label and use as mask for image
+ 	voxel_mask4 = img_array3[Bool.(erode(lbl_array4))]
+ 	I4 = sum(voxel_mask4)
+ 	num_voxels_tot4 = length(voxel_mask4)
+	
+ 	num_voxels_obj4 = num_voxels(I4, num_voxels_tot4, S_BG4, S_O4)
 end;
 
 # ╔═╡ 1cf5bedc-dad0-474a-a4a6-e46fca551fde
@@ -194,6 +231,14 @@ begin
 	# 100 kV
 	vol_obj_mm2 = voxel_size_mm * num_voxels_obj2 # mm^3
 	vol_obj_cm2 = vol_obj_mm2 * 0.001 # cm^3
+		
+	# 120 kV
+	vol_obj_mm3 = voxel_size_mm * num_voxels_obj3 # mm^3
+	vol_obj_cm3 = vol_obj_mm3 * 0.001 # cm^3
+	
+	# 135 kV
+	vol_obj_mm4 = voxel_size_mm * num_voxels_obj4 # mm^3
+	vol_obj_cm4 = vol_obj_mm4 * 0.001 # cm^3
 end;
 
 # ╔═╡ 6700b739-b0b3-473d-9d49-9584537871db
@@ -206,8 +251,14 @@ begin
 	# 80 kV
 	m_Ca = vol_obj_cm * ρ_Ca # g/cc
 	
-	# 80 kV
+	# 100 kV
 	m_Ca2 = vol_obj_cm2 * ρ_Ca # g/cc
+	
+	# 120 kV
+	m_Ca3 = vol_obj_cm3 * ρ_Ca # g/cc
+	
+	# 135 kV
+	m_Ca4 = vol_obj_cm4 * ρ_Ca # g/cc
 end;
 
 # ╔═╡ 3332b7b8-625c-4440-9dad-07bfa2a3dd91
@@ -232,7 +283,7 @@ md"""
 """
 
 # ╔═╡ f4ed499d-19a6-4908-bf94-6582ad57fc3c
-masses = [m_Ca, m_Ca2];
+masses = [m_Ca, m_Ca2, m_Ca3, m_Ca4];
 
 # ╔═╡ 55ee2d9c-d699-48d2-a414-36650f1868e3
 df = DataFrame(ground_truth_mass = gt_m_Ca, calcium_mass = masses)
