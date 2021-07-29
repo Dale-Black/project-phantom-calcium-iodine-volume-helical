@@ -22,7 +22,7 @@
 - [ ] Mass measurement
   * [Large notebook](https://github.com/Dale-Black/project-phantom-calcium-iodine-volume-helical/blob/main/notebooks/mass_calculation_large.jl)
       * 50 g/cc
-        * all kV's (80, 100, 120, 135)
+        * all kV's (~~80~~, ~~100~~, 120, 135)
         * all heart rates (0, 60, 80, 100)
       * 100 g/cc
         * all kV's (80, 100, 120, 135)
