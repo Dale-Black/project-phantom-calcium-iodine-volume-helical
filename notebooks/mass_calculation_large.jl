@@ -72,6 +72,9 @@ begin
 	
 	# 100 kV
 	image_path2 = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 1^275\49\100.0"
+	
+	# 120 kV
+	image_path3 = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 1^275\49\120.0"
 end;
 
 # ╔═╡ 83f34417-0a1c-4228-8026-2b9cf80889d4
