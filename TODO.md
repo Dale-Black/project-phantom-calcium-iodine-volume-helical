@@ -3,7 +3,7 @@
 - [ ] Calibration measurement (use static, 0 bpm, scans for calibration)
   *  [Large notebook](https://github.com/Dale-Black/project-phantom-calcium-iodine-volume-helical/blob/main/notebooks/calibration_large.jl)
       * 50 g/cc
-        * all kV's (~~80~~, ~~100~~, 120, 135)
+        * all kV's (~~80~~, ~~100~~, ~~120~~, ~~135~~)
       * 100 g/cc
         * all kV's (80, 100, 120, 135)
       * 200 g/cc
