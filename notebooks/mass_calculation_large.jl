@@ -51,6 +51,7 @@ These values come from the calibration_large.jl notebook
 
 # ╔═╡ c8ce2c83-a12d-45fb-b708-7946f0fba3ef
 begin
+<<<<<<< HEAD
 	S_BG, S_O = 61.7512, 628.096
 	S_BG2, S_O2 = 57.0129, 529.946
 	S_BG3, S_O3 = 56.1334, 483.304
@@ -79,6 +80,7 @@ begin
 	image_path2 = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 4^275\52\100.0"
 	
 	# 120 kV
+<<<<<<< HEAD
 	image_path3 = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 4^275\52\120.0"
 	
 	# 135 kV
@@ -116,7 +118,7 @@ begin
 	img_array2 = load_dcm_array(img2)
 	img_array2, affvol2, new_affvol2 = DICOMUtils.orientation(img_array2, orient)
 	img_array2 = permutedims(img_array2, (2, 1, 3))
-	
+
 	img_array3 = load_dcm_array(img3)
 	img_array3, affvol3, new_affvol3 = DICOMUtils.orientation(img_array3, orient)
 	img_array3 = permutedims(img_array3, (2, 1, 3))
@@ -212,7 +214,7 @@ begin
 	# 100 kV
 	vol_obj_mm2 = voxel_size_mm * num_voxels_obj2 # mm^3
 	vol_obj_cm2 = vol_obj_mm2 * 0.001 # cm^3
-	
+
 	# 120 kV
 	vol_obj_mm3 = voxel_size_mm * num_voxels_obj3 # mm^3
 	vol_obj_cm3 = vol_obj_mm3 * 0.001 # cm^3
@@ -240,7 +242,7 @@ begin
 	
 	# 135 kV
 	m_Ca4 = vol_obj_cm4 * ρ_Ca # g/cc
-	
+
 end;
 
 # ╔═╡ 3332b7b8-625c-4440-9dad-07bfa2a3dd91
