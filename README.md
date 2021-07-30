@@ -1,3 +1,4 @@
 # project-phantom-calcium-iodine-volume-helical
 
-Hi
+
+Repository for working with CIRS dynamic phantom
