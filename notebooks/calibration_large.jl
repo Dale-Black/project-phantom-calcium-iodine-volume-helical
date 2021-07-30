@@ -207,7 +207,7 @@ begin
 	scatter!(ax_4, label_arr[:,1][indices_l], label_arr[:,2][indices_l], markersize=1, color=:red)
 	fig
 end
-
+		
 # ╔═╡ 3cb21e2c-07e4-4e07-8331-5a0d48889072
 md"""
 ## Calibrate
@@ -260,6 +260,7 @@ begin
 	S_O = mean(c_img)
 	
 	# 100 kV
+<<<<<<< HEAD
 	c_img2 = img_array2[core]
 	c_img2 = c_img2[c_img2 .> thresh]
 	S_O2 = mean(c_img2)
