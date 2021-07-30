@@ -30,6 +30,7 @@ begin
 		Pkg.add(url="https://github.com/Dale-Black/IntegratedHU.jl")
 		Pkg.add(url="https://github.com/Dale-Black/DICOMUtils.jl")
 		Pkg.add("PlutoUI")
+		Pkg.add("CSV")
 	end
 	
 	using Revise
@@ -44,6 +45,7 @@ begin
 	using DataFrames
 	using IntegratedHU
 	using DICOMUtils
+	using CSV
 end
 
 # ╔═╡ 401e5509-40bf-48f8-8593-fd4f538c6805
@@ -58,16 +60,25 @@ md"""
 Currently, this notebook only loads the 100 kV segmentation. This should be updated to load all 4 kV's (80, 100, 120, 135)
 """
 
+# ╔═╡ 2fc032ad-b041-4fc4-8661-53b9fde5563d
+image_path = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 4^275\52\80.0";
+
+# ╔═╡ dc937793-ba7d-4e23-b55d-b73babaf68ec
+image_path2 = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 4^275\52\100.0";
+
+# ╔═╡ 00ee0012-f44e-466c-a68e-0c5380436dd8
+image_path3 = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 4^275\52\120.0";
+
+# ╔═╡ e114ac6a-375b-4f29-85ab-fe917f67137d
+image_path4 = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 4^275\52\135.0";
+
+# ╔═╡ 639cd8f6-e16a-46dd-9430-8c38ce3648ae
+label_path = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 4^275\HEL_SLICER_SEG_0\80\L_5.0.nii";
+
 # ╔═╡ 06db439a-134e-4484-8f10-9102cfef5352
 md"""
 ### 80 kV
 """
-
-# ╔═╡ 2fc032ad-b041-4fc4-8661-53b9fde5563d
-image_path = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 4^275\52\80.0";
-
-# ╔═╡ 639cd8f6-e16a-46dd-9430-8c38ce3648ae
-label_path = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 4^275\HEL_SLICER_SEG_0\80\L_5.0.nii";
 
 # ╔═╡ dc44351b-c4fb-44e3-918e-75a87dd3fb1a
 begin
@@ -97,9 +108,6 @@ md"""
 ### 100 kV
 """
 
-# ╔═╡ dc937793-ba7d-4e23-b55d-b73babaf68ec
-image_path2 = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 4^275\52\100.0";
-
 # ╔═╡ a3c0cb8a-2ce6-4a29-b371-f4f194973a41
 img_2 = dcmdir_parse(image_path2);
 
@@ -116,9 +124,6 @@ md"""
 ### 120 kV
 """
 
-# ╔═╡ 00ee0012-f44e-466c-a68e-0c5380436dd8
-image_path3 = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 4^275\52\120.0";
-
 # ╔═╡ dcf6b2cc-72c7-4322-b0ef-764d8a7590eb
 img_3 = dcmdir_parse(image_path3);
 
@@ -134,9 +139,6 @@ end;
 md"""
 ### 135 kV
 """
-
-# ╔═╡ e114ac6a-375b-4f29-85ab-fe917f67137d
-image_path4 = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 4^275\52\135.0";
 
 # ╔═╡ 94f63f2c-e1ca-4b9f-b65b-ab1066058e6d
 img_4 = dcmdir_parse(image_path4);
@@ -207,7 +209,7 @@ begin
 	scatter!(ax_4, label_arr[:,1][indices_l], label_arr[:,2][indices_l], markersize=1, color=:red)
 	fig
 end
-		
+
 # ╔═╡ 3cb21e2c-07e4-4e07-8331-5a0d48889072
 md"""
 ## Calibrate
@@ -249,6 +251,9 @@ md"""
 ### Calculate `S_O`s
 """
 
+# ╔═╡ 8606be3c-7bbb-4ce1-9eff-95708708cab0
+correction = 100
+
 # ╔═╡ f1361ff7-f0b5-4c91-9dfd-63474ce808ab
 begin
 	
@@ -257,23 +262,22 @@ begin
 	# 80 kV
 	c_img = img_array[core]
 	c_img = c_img[c_img .> thresh]
-	S_O = mean(c_img)
+	S_O = mean(c_img) - correction
 	
 	# 100 kV
-<<<<<<< HEAD
 	c_img2 = img_array2[core]
 	c_img2 = c_img2[c_img2 .> thresh]
-	S_O2 = mean(c_img2)
+	S_O2 = mean(c_img2) - correction
 	
 	# 120 kV
 	c_img3 = img_array3[core]
 	c_img3 = c_img3[c_img3 .> thresh]
-	S_O3 = mean(c_img3)
+	S_O3 = mean(c_img3) - correction
 	
 	# 135 kV
 	c_img4 = img_array4[core]
 	c_img4 = c_img4[c_img4 .> thresh]
-	S_O4 = mean(c_img4)
+	S_O4 = mean(c_img4) - correction
 end
 
 # ╔═╡ 9d56d1bf-171d-4e66-a0f3-f610dfde9edd
@@ -308,11 +312,14 @@ S_BGs, S_Os = [S_BG, S_BG2, S_BG3, S_BG4], [S_O, S_O2, S_O3, S_O4]
 # ╔═╡ 5ef0ed13-59d6-44cb-949f-e92e26a7662b
 df = DataFrame(S_BGs = S_BGs, S_Os = S_Os)
 
+# ╔═╡ b112731d-cbfb-4086-b921-3bc307790e57
+df_name = "/calibration_helical_400_Ca.csv"
+
 # ╔═╡ d99f04c9-7238-4e29-b108-d1298db0cc4c
-# save_path = ".."
+save_path = raw"C:\Users\Ziemer\Dale\dev\julia\project-phantom-calcium-iodine-volume-helical\data" * df_name;
 
 # ╔═╡ 9dbbe3cb-adb8-4abd-a6da-31b3c6ce236e
-# CSV.write(save_path, df)
+CSV.write(save_path, df)
 
 # ╔═╡ Cell order:
 # ╠═85e8a0e3-4de3-4933-9a52-35436bbde55f
@@ -352,6 +359,7 @@ df = DataFrame(S_BGs = S_BGs, S_Os = S_Os)
 # ╟─313ad781-97b0-4091-bb1a-a3534ee00b2d
 # ╠═77399f48-e100-45ea-ab0a-49b39e84f904
 # ╟─bad81568-5edc-4821-a0cb-6833f911ac0b
+# ╠═8606be3c-7bbb-4ce1-9eff-95708708cab0
 # ╠═f1361ff7-f0b5-4c91-9dfd-63474ce808ab
 # ╟─9d56d1bf-171d-4e66-a0f3-f610dfde9edd
 # ╟─105dbd69-b579-41ed-a3ce-0ea4124c547b
@@ -359,5 +367,6 @@ df = DataFrame(S_BGs = S_BGs, S_Os = S_Os)
 # ╟─6e52d101-f7ac-4063-8e69-4562854639dc
 # ╠═f21103e4-f3ad-44ac-b877-4c95e8000a72
 # ╠═5ef0ed13-59d6-44cb-949f-e92e26a7662b
+# ╠═b112731d-cbfb-4086-b921-3bc307790e57
 # ╠═d99f04c9-7238-4e29-b108-d1298db0cc4c
 # ╠═9dbbe3cb-adb8-4abd-a6da-31b3c6ce236e
