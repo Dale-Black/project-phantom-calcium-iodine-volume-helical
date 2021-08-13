@@ -31,6 +31,7 @@ begin
 		Pkg.add(url="https://github.com/Dale-Black/DICOMUtils.jl")
 		Pkg.add("PlutoUI")
 		Pkg.add("CSV")
+		Pkg.add("StatsBase")
 	end
 	
 	using Revise
@@ -46,13 +47,11 @@ begin
 	using IntegratedHU
 	using DICOMUtils
 	using CSV
+	using StatsBase
 end
 
 # ╔═╡ 401e5509-40bf-48f8-8593-fd4f538c6805
 TableOfContents()
-
-# ╔═╡ 4f6cd82a-0fef-4f4b-bf89-c4628714bdf9
-thresh = 15
 
 # ╔═╡ baa7cd06-10e6-4f9a-8ffd-1f458253d5fb
 md"""
@@ -60,20 +59,22 @@ md"""
 Currently, this notebook only loads the 100 kV segmentation. This should be updated to load all 4 kV's (80, 100, 120, 135)
 """
 
-# ╔═╡ 2fc032ad-b041-4fc4-8661-53b9fde5563d
-image_path = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 4^275\52\80.0";
+# ╔═╡ b112731d-cbfb-4086-b921-3bc307790e57
+#df_name = "/calibration_helical_fbp_400_Ca.csv"
 
-# ╔═╡ dc937793-ba7d-4e23-b55d-b73babaf68ec
-image_path2 = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 4^275\52\100.0";
-
-# ╔═╡ 00ee0012-f44e-466c-a68e-0c5380436dd8
-image_path3 = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 4^275\52\120.0";
-
-# ╔═╡ e114ac6a-375b-4f29-85ab-fe917f67137d
-image_path4 = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 4^275\52\135.0";
+# ╔═╡ e72bb45d-97fa-44f1-96d7-cfa8ceea8993
+begin
+	image_path = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 4^275\52\80.0"
+	
+	image_path2 = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 4^275\52\100.0"
+	
+	image_path3 = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 4^275\52\120.0"
+	
+	image_path4 = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 4^275\52\135.0"
+end;
 
 # ╔═╡ 639cd8f6-e16a-46dd-9430-8c38ce3648ae
-label_path = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 4^275\HEL_SLICER_SEG_0\80\L_5.0.nii";
+label_path = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 4^275\HEL_SLICER_SEG_0\135\L_5.0.nii";
 
 # ╔═╡ 06db439a-134e-4484-8f10-9102cfef5352
 md"""
@@ -188,6 +189,7 @@ indices_l = findall(x -> x == zs_l[q], label_arr[:,3]);
 # ╔═╡ b4593c55-e98f-4357-b874-fb8dfa570e5c
 begin
 	fig = Figure()
+	
 	ax = Makie.Axis(fig[1, 1])
 	ax.title = "Large Insert (80 kV)"
 	heatmap!(ax, img_array[:,:,zs_l[q]], colormap=:grays)
@@ -207,6 +209,7 @@ begin
 	ax_4.title = "Large Insert (135 kV)"
 	heatmap!(ax_4, img_array3[:,:,zs_l[q]], colormap=:grays)
 	scatter!(ax_4, label_arr[:,1][indices_l], label_arr[:,2][indices_l], markersize=1, color=:red)
+	
 	fig
 end
 
@@ -220,29 +223,54 @@ md"""
 ### Calculate `S_BG`s
 """
 
+# ╔═╡ 153632a0-41e3-4eec-8551-261509dbeb7a
+ring2 = Bool.((dilate(lbl_array)) - (lbl_array));
+
+# ╔═╡ d5362ab4-4059-4d4c-8e6c-e35435fc8df0
+begin
+	r_imgthresh = img_array[ring2]
+	cpthresh = copy(r_imgthresh)
+end
+
+# ╔═╡ 205fbeee-e95f-46db-8451-79b6b097a252
+mean(cpthresh)
+
+# ╔═╡ 5796b414-7a16-4b8d-a09c-e4219c055389
+
+
+# ╔═╡ f5b1baa7-890e-424e-8cfe-6db86aafe3c0
+std(cpthresh)
+
 # ╔═╡ 77399f48-e100-45ea-ab0a-49b39e84f904
 begin
-	
-	ring = Bool.(dilate(dilate(dilate(dilate(lbl_array)))) - dilate(lbl_array))
+	ring = Bool.(((dilate(dilate(dilate(lbl_array))))) - dilate(dilate(lbl_array)))
 	
 	# 80 kV
 	r_img = img_array[ring]
+	cp = copy(r_img)
+	thresh = mean(cp) - 2*std(cp)
 	r_img = r_img[r_img .> thresh]
 	S_BG = mean(r_img)
 	
 	# 100 kV
 	r_img2 = img_array2[ring]
-	r_img2 = r_img2[r_img2 .> thresh]
+	cp2 = copy(r_img2)
+	thresh2 = mean(cp2) - 2*std(cp2)
+	r_img2 = r_img2[r_img2 .> thresh2]
 	S_BG2 = mean(r_img2)
 	
 	# 120 kV
 	r_img3 = img_array3[ring]
-	r_img3 = r_img3[r_img3 .> thresh]
+	cp3 = copy(r_img3)
+	thresh3 = mean(cp3) - 2*std(cp3)
+	r_img3 = r_img3[r_img3 .> thresh3]
 	S_BG3 = mean(r_img3)
 	
 	# 135 kV
 	r_img4 = img_array4[ring]
-	r_img4 = r_img4[r_img4 .> thresh]
+	cp4 = copy(r_img4)
+	thresh4 = mean(cp4) - 2*std(cp4)
+	r_img4 = r_img4[r_img4 .> thresh4]
 	S_BG4 = mean(r_img4)
 end
 
@@ -251,33 +279,26 @@ md"""
 ### Calculate `S_O`s
 """
 
-# ╔═╡ 8606be3c-7bbb-4ce1-9eff-95708708cab0
-correction = 100
-
 # ╔═╡ f1361ff7-f0b5-4c91-9dfd-63474ce808ab
 begin
 	
-	core = Bool.((erode(erode(lbl_array))))
+	core = Bool.((erode(lbl_array)))
 	
 	# 80 kV
 	c_img = img_array[core]
-	c_img = c_img[c_img .> thresh]
-	S_O = mean(c_img) - correction
+	S_O = mean(c_img) 
 	
 	# 100 kV
 	c_img2 = img_array2[core]
-	c_img2 = c_img2[c_img2 .> thresh]
-	S_O2 = mean(c_img2) - correction
+	S_O2 = mean(c_img2)
 	
 	# 120 kV
 	c_img3 = img_array3[core]
-	c_img3 = c_img3[c_img3 .> thresh]
-	S_O3 = mean(c_img3) - correction
+	S_O3 = mean(c_img3) 
 	
 	# 135 kV
 	c_img4 = img_array4[core]
-	c_img4 = c_img4[c_img4 .> thresh]
-	S_O4 = mean(c_img4) - correction
+	S_O4 = mean(c_img4) 
 end
 
 # ╔═╡ 9d56d1bf-171d-4e66-a0f3-f610dfde9edd
@@ -295,11 +316,24 @@ begin
 	ax1.title = "Ring 80 kV (S_BG)"
 	heatmap!(ax1, ring[:, :, b], colormap=:grays)
 	
+	
 	ax2 = Makie.Axis(f[1, 2])
 	ax2.title = "Core 80 kV (S_O)"
 	heatmap!(ax2, core[:, :, b], colormap=:grays)
+	
 	f
 end
+
+# ╔═╡ 392759f8-e41c-473e-b963-edab8f495314
+begin
+	im = zeros(5, 5); 
+	im[3, 3] = 1.; 
+	im[3, 4] = 1.
+	im
+end
+
+# ╔═╡ 9f379435-01da-4ed0-a03b-d8d35490a429
+dilate(im)
 
 # ╔═╡ 6e52d101-f7ac-4063-8e69-4562854639dc
 md"""
@@ -309,27 +343,24 @@ md"""
 # ╔═╡ f21103e4-f3ad-44ac-b877-4c95e8000a72
 S_BGs, S_Os = [S_BG, S_BG2, S_BG3, S_BG4], [S_O, S_O2, S_O3, S_O4]
 
+# ╔═╡ d7c2e7fb-d529-4909-9771-36a5d68d50fd
+thresh, thresh2, thresh3, thresh4
+
 # ╔═╡ 5ef0ed13-59d6-44cb-949f-e92e26a7662b
 df = DataFrame(S_BGs = S_BGs, S_Os = S_Os)
 
-# ╔═╡ b112731d-cbfb-4086-b921-3bc307790e57
-df_name = "/calibration_helical_400_Ca.csv"
-
 # ╔═╡ d99f04c9-7238-4e29-b108-d1298db0cc4c
-save_path = raw"C:\Users\Ziemer\Dale\dev\julia\project-phantom-calcium-iodine-volume-helical\data" * df_name;
+#save_path = raw"C:\Users\Ziemer\Dale\dev\julia\project-phantom-calcium-iodine-volume-helical\data" * df_name;
 
 # ╔═╡ 9dbbe3cb-adb8-4abd-a6da-31b3c6ce236e
-CSV.write(save_path, df)
+#CSV.write(save_path, df)
 
 # ╔═╡ Cell order:
 # ╠═85e8a0e3-4de3-4933-9a52-35436bbde55f
 # ╠═401e5509-40bf-48f8-8593-fd4f538c6805
-# ╠═4f6cd82a-0fef-4f4b-bf89-c4628714bdf9
 # ╟─baa7cd06-10e6-4f9a-8ffd-1f458253d5fb
-# ╠═2fc032ad-b041-4fc4-8661-53b9fde5563d
-# ╠═dc937793-ba7d-4e23-b55d-b73babaf68ec
-# ╠═00ee0012-f44e-466c-a68e-0c5380436dd8
-# ╠═e114ac6a-375b-4f29-85ab-fe917f67137d
+# ╠═b112731d-cbfb-4086-b921-3bc307790e57
+# ╠═e72bb45d-97fa-44f1-96d7-cfa8ceea8993
 # ╠═639cd8f6-e16a-46dd-9430-8c38ce3648ae
 # ╟─06db439a-134e-4484-8f10-9102cfef5352
 # ╠═dc44351b-c4fb-44e3-918e-75a87dd3fb1a
@@ -353,20 +384,26 @@ CSV.write(save_path, df)
 # ╠═388b30ad-02f2-47ca-a76e-debb954d26d5
 # ╠═8a3efe87-8931-4d97-a354-c4f6d0bdeebc
 # ╠═8ee2cb50-68c7-4efc-afec-a80b0ab698fb
-# ╟─caa4ed3d-47e5-4030-bb9f-0d70f791f348
+# ╠═caa4ed3d-47e5-4030-bb9f-0d70f791f348
 # ╠═b4593c55-e98f-4357-b874-fb8dfa570e5c
 # ╟─3cb21e2c-07e4-4e07-8331-5a0d48889072
 # ╟─313ad781-97b0-4091-bb1a-a3534ee00b2d
+# ╠═153632a0-41e3-4eec-8551-261509dbeb7a
+# ╠═d5362ab4-4059-4d4c-8e6c-e35435fc8df0
+# ╠═205fbeee-e95f-46db-8451-79b6b097a252
+# ╠═5796b414-7a16-4b8d-a09c-e4219c055389
+# ╠═f5b1baa7-890e-424e-8cfe-6db86aafe3c0
 # ╠═77399f48-e100-45ea-ab0a-49b39e84f904
 # ╟─bad81568-5edc-4821-a0cb-6833f911ac0b
-# ╠═8606be3c-7bbb-4ce1-9eff-95708708cab0
 # ╠═f1361ff7-f0b5-4c91-9dfd-63474ce808ab
 # ╟─9d56d1bf-171d-4e66-a0f3-f610dfde9edd
-# ╟─105dbd69-b579-41ed-a3ce-0ea4124c547b
+# ╠═105dbd69-b579-41ed-a3ce-0ea4124c547b
 # ╠═019d3f86-3ee8-4615-8a62-69a93f93d5ca
+# ╠═392759f8-e41c-473e-b963-edab8f495314
+# ╠═9f379435-01da-4ed0-a03b-d8d35490a429
 # ╟─6e52d101-f7ac-4063-8e69-4562854639dc
 # ╠═f21103e4-f3ad-44ac-b877-4c95e8000a72
+# ╠═d7c2e7fb-d529-4909-9771-36a5d68d50fd
 # ╠═5ef0ed13-59d6-44cb-949f-e92e26a7662b
-# ╠═b112731d-cbfb-4086-b921-3bc307790e57
 # ╠═d99f04c9-7238-4e29-b108-d1298db0cc4c
 # ╠═9dbbe3cb-adb8-4abd-a6da-31b3c6ce236e

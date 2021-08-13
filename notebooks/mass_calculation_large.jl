@@ -11,8 +11,6 @@ begin
 		Pkg.activate(mktempdir())
 		Pkg.Registry.update()
 		Pkg.add("BenchmarkTools")
-		Pkg.add("CairoMakie")
-		Pkg.add("Revise")
 		Pkg.add(url="https://github.com/JuliaNeuroscience/NIfTI.jl")
 		Pkg.add("DICOM")
 		Pkg.add("Images")
@@ -21,13 +19,12 @@ begin
 		Pkg.add(url="https://github.com/Dale-Black/IntegratedHU.jl")
 		Pkg.add(url="https://github.com/Dale-Black/DICOMUtils.jl")
 		Pkg.add("PlutoUI")
+		Pkg.add("CSV")
 	end
 	
-	using Revise
 	using PlutoUI
 	using Statistics
 	using BenchmarkTools
-	using CairoMakie
 	using DICOM
 	using NIfTI
 	using Images
@@ -35,27 +32,28 @@ begin
 	using DataFrames
 	using IntegratedHU
 	using DICOMUtils
+	using CSV
 end
 
 # ╔═╡ 490e5d53-f3cd-4829-b44c-f19d0b79de88
 TableOfContents()
 
-# ╔═╡ 3cb32e70-9142-4cb1-9575-2c34773dbada
-thresh = 15
-
 # ╔═╡ 0320ac33-16dd-4f82-9878-858d0070459e
 md"""
-## Input `S_BG` and `S_O`
+## Input `S_BG` and `S_O` and `thresh`
 These values come from the calibration_large.jl notebook
 """
 
 # ╔═╡ c8ce2c83-a12d-45fb-b708-7946f0fba3ef
 begin
-	S_BG, S_O = 61.7512, 528.096
-	S_BG2, S_O2 = 57.0129, 429.946
-	S_BG3, S_O3 = 56.1334, 383.304
-	S_BG4, S_O4 = 58.7393, 343.831
+	S_BG, S_O 	= 	22.6298,	509.829
+	S_BG2, S_O2 = 	23.7816,	432.079
+	S_BG3, S_O3 = 	25.605,		388.146
+	S_BG4, S_O4 = 	20.7187,	360.986
 end;
+
+# ╔═╡ 71d0905a-2c9e-448a-ba55-804b297f11ae
+thresh, thresh2, thresh3, thresh4 = -314.276, -311.105, -307.21, -315.739
 
 # ╔═╡ 48a0715a-bccb-4270-9bd3-f1ec633a19bc
 md"""
@@ -65,10 +63,25 @@ md"""
 # ╔═╡ 3f952f50-be47-45bb-b6d4-63d7a4866969
 ρ_Ca = 400 # g/cc == g/cm^3
 
+# ╔═╡ 148c3fb1-b979-423a-a578-718df6c9bf8d
+md"""
+### Calibrations for input calcium density
+"""
+
+# ╔═╡ d84fb483-9fd7-4fff-8e31-53fbac71d72a
+# begin
+# 	ratio = ρ_Ca/250
+# 	S_Os_in_use = S_Os * ratio
+# 	S_BGs_in_use = S_BGs * ratio
+# end
+
 # ╔═╡ ebd939e6-59e2-4d6b-bd14-ac6851cca936
 md"""
 ## Load data
 """
+
+# ╔═╡ 9ef43dbe-d3d2-4b29-bafb-69b1f20f1f72
+# df_name = "/measurement_helical_fbp_400_Ca.csv"
 
 # ╔═╡ 2a1309fb-4c38-4374-961d-cd63475ea17f
 begin
@@ -87,7 +100,7 @@ begin
 end;
 
 # ╔═╡ 83f34417-0a1c-4228-8026-2b9cf80889d4
-label_path = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 4^275\HEL_SLICER_SEG_0\80\L_5.0.nii";
+label_path = raw"Y:\Canon Images for Dynamic Heart Phantom\Dynamic Phantom\clean_data\CONFIG 4^275\HEL_SLICER_SEG_0\135\L_5.0.nii";
 
 # ╔═╡ 63cdb8fd-80a2-49b9-b9c1-22cfcad8f15c
 begin
@@ -136,17 +149,11 @@ md"""
 ### Calculate voxel size
 """
 
-# ╔═╡ 8527716f-465b-4264-975b-14c3ae4fe08c
-begin
-	const PixelSpacing = (0x0028, 0x0030)
-	x_sz, y_sz = img[1][PixelSpacing]
-end
+# ╔═╡ 35802304-bc0c-4afc-94b7-b3192172c58a
+vsize = voxel_size(lbl.header);
 
-# ╔═╡ 3a063afe-71b6-418a-b32f-a9d9ab084ca8
-begin
-	const SliceThickness = (0x0018, 0x0050)
-	z_sz = img[1][SliceThickness]
-end
+# ╔═╡ 9422f48c-5a4a-426c-91fb-2f71007549e6
+x_sz, y_sz, z_sz = vsize
 
 # ╔═╡ 7eb4c259-ea1c-401f-9357-7519be3375be
 voxel_size_mm = x_sz * y_sz * z_sz # mm^3
@@ -174,7 +181,7 @@ begin
 	
 	# 100 kV
 	voxel_mask2 = img_array2[Bool.(dilate(lbl_array))]
-	voxel_mask2 = voxel_mask2[voxel_mask2 .> thresh]
+	voxel_mask2 = voxel_mask2[voxel_mask2 .> thresh2]
 	I2 = sum(voxel_mask2)
 	num_voxels_tot2 = length(voxel_mask2)
 	
@@ -182,7 +189,7 @@ begin
 	
  	# 120 kV
  	voxel_mask3 = img_array3[Bool.(dilate(lbl_array))]
-	voxel_mask3 = voxel_mask3[voxel_mask3 .> thresh]
+	voxel_mask3 = voxel_mask3[voxel_mask3 .> thresh3]
  	I3 = sum(voxel_mask3)
  	num_voxels_tot3 = length(voxel_mask3)
 	
@@ -190,16 +197,13 @@ begin
 	
 	# 135 kV
  	voxel_mask4 = img_array4[Bool.(dilate(lbl_array))]
-	voxel_mask4 = voxel_mask4[voxel_mask4 .> thresh]
+	voxel_mask4 = voxel_mask4[voxel_mask4 .> thresh4]
  	I4 = sum(voxel_mask4)
  	num_voxels_tot4 = length(voxel_mask4)
 	
  	num_voxels_obj4 = num_voxels(I4, num_voxels_tot4, S_BG4, S_O4)
 	
 end;
-
-# ╔═╡ 05d81d30-1877-4ae4-a734-f7528ae88fe4
-num_voxels_tot
 
 # ╔═╡ 1cf5bedc-dad0-474a-a4a6-e46fca551fde
 md"""
@@ -274,10 +278,10 @@ masses = [m_Ca, m_Ca2, m_Ca3, m_Ca4];
 df = DataFrame(ground_truth_mass = gt_m_Ca, calcium_mass = masses)
 
 # ╔═╡ ac220b8c-3378-4e5f-b599-ee4778f6a7e3
-# save_path = ".."
+#save_path = raw"C:\Users\Ziemer\Dale\dev\julia\project-phantom-calcium-iodine-volume-helical\data" * df_name;
 
 # ╔═╡ 132fe985-9b67-47f2-a7a8-949f30a9cc26
-# CSV.write(save_path, df) UPDATE
+#CSV.write(save_path, df)
 
 # ╔═╡ c155eca3-fbce-42a1-b71c-458c17d2f767
 
@@ -285,12 +289,15 @@ df = DataFrame(ground_truth_mass = gt_m_Ca, calcium_mass = masses)
 # ╔═╡ Cell order:
 # ╠═6f16e0ec-eb29-11eb-37bd-6fd61abf4218
 # ╠═490e5d53-f3cd-4829-b44c-f19d0b79de88
-# ╠═3cb32e70-9142-4cb1-9575-2c34773dbada
 # ╟─0320ac33-16dd-4f82-9878-858d0070459e
 # ╠═c8ce2c83-a12d-45fb-b708-7946f0fba3ef
+# ╠═71d0905a-2c9e-448a-ba55-804b297f11ae
 # ╟─48a0715a-bccb-4270-9bd3-f1ec633a19bc
 # ╠═3f952f50-be47-45bb-b6d4-63d7a4866969
+# ╟─148c3fb1-b979-423a-a578-718df6c9bf8d
+# ╠═d84fb483-9fd7-4fff-8e31-53fbac71d72a
 # ╟─ebd939e6-59e2-4d6b-bd14-ac6851cca936
+# ╠═9ef43dbe-d3d2-4b29-bafb-69b1f20f1f72
 # ╠═2a1309fb-4c38-4374-961d-cd63475ea17f
 # ╠═83f34417-0a1c-4228-8026-2b9cf80889d4
 # ╠═63cdb8fd-80a2-49b9-b9c1-22cfcad8f15c
@@ -299,13 +306,12 @@ df = DataFrame(ground_truth_mass = gt_m_Ca, calcium_mass = masses)
 # ╠═7bc37e36-e9c2-4d65-add6-8ed298be4204
 # ╟─de3c29ef-92c1-4913-b77e-cd0037ea83ed
 # ╟─a2827168-5058-499f-9b71-c9a1e4edb1a3
-# ╠═8527716f-465b-4264-975b-14c3ae4fe08c
-# ╠═3a063afe-71b6-418a-b32f-a9d9ab084ca8
+# ╠═35802304-bc0c-4afc-94b7-b3192172c58a
+# ╠═9422f48c-5a4a-426c-91fb-2f71007549e6
 # ╠═7eb4c259-ea1c-401f-9357-7519be3375be
 # ╟─1491e8b1-64ec-4ec7-9aae-56fb90070fae
 # ╠═5f76c2c4-7cc0-40f1-9e4b-4b1ebdd97baf
 # ╠═21ce576c-58cc-4bdb-90e6-b97af45c8342
-# ╠═05d81d30-1877-4ae4-a734-f7528ae88fe4
 # ╟─1cf5bedc-dad0-474a-a4a6-e46fca551fde
 # ╠═297e22fb-18df-4dfe-9de0-c0668ebf93d7
 # ╟─6700b739-b0b3-473d-9d49-9584537871db
