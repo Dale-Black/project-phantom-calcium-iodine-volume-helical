@@ -142,6 +142,9 @@ md"""
 ### Added noise
 """
 
+# ╔═╡ 97bbe15c-af56-4723-b833-a45dd84e55f5
+
+
 # ╔═╡ 30822b26-3860-4219-bc2e-3474113f0f1f
 noisy_ell3D = zeros(size(ell3D));
 
@@ -259,6 +262,7 @@ score(S_Bkg, S_Obj, alg4) # Calculated noisy
 # ╠═34a0b536-873f-4f65-8f84-731af10604a6
 # ╠═280c5517-459b-404a-9d70-e2422c78f441
 # ╟─3e928e68-f866-491e-a6b1-975e74ccc44f
+# ╠═97bbe15c-af56-4723-b833-a45dd84e55f5
 # ╠═30822b26-3860-4219-bc2e-3474113f0f1f
 # ╠═59dd9747-b0de-4c58-b131-38a0715ae68b
 # ╟─147ecf74-04b4-4056-9a47-aa97a401ef78
