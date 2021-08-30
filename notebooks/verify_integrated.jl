@@ -24,6 +24,8 @@ begin
 				"CairoMakie"
 				"ImageFiltering"
 				"DataFrames"
+				"TestImages"
+				"Images"
 				])
 		Pkg.add(url="https://github.com/Dale-Black/ActiveContours.jl")
 		Pkg.add(url="https://github.com/Dale-Black/CalciumScoring.jl")
@@ -33,6 +35,8 @@ begin
 	using CairoMakie
 	using ImageFiltering
 	using DataFrames
+	using TestImages
+	using Images
 	using ActiveContours
 	using CalciumScoring # contains Integrated code
 end
@@ -238,7 +242,89 @@ score(S_Bkg, S_Obj, alg3) # Calculate clean
 score(S_Bkg, S_Obj, alg4) # Calculated noisy
 
 # ╔═╡ 62cbf38f-9da1-4c45-8418-c5d7597d76fd
+md"""
+## Test 3 materials
+"""
 
+# ╔═╡ d883c716-5856-408a-b656-3dc505cf1f45
+begin
+	vsize = 256, 256
+	e2 = lazy_ellipsoid_level_set(vsize)
+	ellipsoid2 = to_array(vsize, e2)
+	ell2 = Int64.(ellipsoid2)
+	ell2[ell2 .> 0] .= 200 				# approximate intensity of calcium
+	ell2[ell2 .< 1] .= -1024 			# intensity of pure air
+	ell2[1:128, :] .= -30 				# approximate intensity of fat
+end;
+
+# ╔═╡ d0cfaca0-2bdb-42c9-bef7-36fdf179d371
+ell2_3D = cat(ell2, ell2, dims=3);
+
+# ╔═╡ 4e71107f-a0bd-4be0-a24c-6c1315a577dc
+size(ell2_3D)
+
+# ╔═╡ 4e53d9f0-b634-4f4f-a2d8-c1326e5451db
+heatmap(ell2_3D[:, :, 2], colormap = :grays)
+
+# ╔═╡ 8c7b4845-c691-456f-bd2e-ddbbb4cabce1
+md"""
+To get the avergage background intensity we need to calculate the number of pixels that correspond to air (-1024) and fat (-30). To do this we will work in 2D and then multiply everything by 2 after, since we have two identical slices
+"""
+
+# ╔═╡ 25a757fa-d4f3-4198-9471-0c4eaeefeb0d
+begin
+	vol_half_square = (128 * 128) * 2				# length * width * 2
+	vol_half_circle = ((π * (128/2)^2) / 2) * 2 	# π * radius^2 / 2 * 2
+	vol_air = vol_half_square - vol_half_circle 	# half square - half circle
+	vol_fat = (128 * 128) * 2 						# length * width * 2
+end
+
+# ╔═╡ 1d1aaaca-862c-4df3-a92d-54eb6649f4e3
+S_Bkg_avg = ((-1024*vol_air) + (-30*vol_fat)) / (vol_air + vol_fat)
+
+# ╔═╡ 3c85eb11-02c8-4bb1-b671-ac88a9e3824f
+S_Obj_avg = 200
+
+# ╔═╡ 8f9db9b5-43b8-4d8a-910b-f09cd405c0b4
+md"""
+Calculate the predicted number of voxels that correspond to calcium, versus the true number of voxels that correspond to calcium
+"""
+
+# ╔═╡ 73d77c9a-65b2-4fd2-a154-4cfc6693f370
+begin
+	alg5 = Integrated(ell2_3D)
+	pred_num = score(S_Bkg_avg, S_Obj_avg, alg5)
+end
+
+# ╔═╡ 03f692be-4a1a-4761-bf06-937389f367b8
+true_num = length(findall(x -> x == 200, ell2_3D))
+
+# ╔═╡ 14b4b7e0-fd6e-4053-af9c-63a7ead640a0
+md"""
+Calculate the predicted volume that corresponds to calcium, versus the true volume that corresponds to calcium
+"""
+
+# ╔═╡ 3ebaaa57-198d-4255-8404-616b4b02af3c
+begin
+	voxel_size = [0.5, 0.5, 0.5]
+	pred_vol = score(S_Bkg_avg, S_Obj_avg, voxel_size, alg5)
+end
+
+# ╔═╡ d623d381-9704-442a-b5ef-a5394ce90739
+true_vol = true_num * voxel_size[1] * voxel_size[2] * voxel_size[3]
+
+# ╔═╡ 9ff747b6-2545-4027-a0be-655f25167d66
+md"""
+Calculate the predicted mass that corresponds to calcium, versus the true mass that corresponds to calcium
+"""
+
+# ╔═╡ 5ca1cfd9-505a-4ba9-888d-24513c9f3090
+begin
+	pred_mass = score(S_Bkg_avg, S_Obj_avg, voxel_size, ρ, alg5)
+end
+
+# ╔═╡ 0c5bd9b0-f1d5-4cee-b031-fdc9d6ebdc8c
+true_mass = ρ * true_vol
 
 # ╔═╡ Cell order:
 # ╠═044050ce-e8e9-11eb-1a6c-8dd3093ad1d8
@@ -284,4 +370,21 @@ score(S_Bkg, S_Obj, alg4) # Calculated noisy
 # ╠═af38bf85-250a-44d9-8d16-bae233dbb714
 # ╠═8bf26f02-32e0-49c1-9f5b-b585e5480d0c
 # ╠═b1147c97-7a33-47ce-a508-cc31d826c5cd
-# ╠═62cbf38f-9da1-4c45-8418-c5d7597d76fd
+# ╟─62cbf38f-9da1-4c45-8418-c5d7597d76fd
+# ╠═d883c716-5856-408a-b656-3dc505cf1f45
+# ╠═d0cfaca0-2bdb-42c9-bef7-36fdf179d371
+# ╠═4e71107f-a0bd-4be0-a24c-6c1315a577dc
+# ╠═4e53d9f0-b634-4f4f-a2d8-c1326e5451db
+# ╟─8c7b4845-c691-456f-bd2e-ddbbb4cabce1
+# ╠═25a757fa-d4f3-4198-9471-0c4eaeefeb0d
+# ╠═1d1aaaca-862c-4df3-a92d-54eb6649f4e3
+# ╠═3c85eb11-02c8-4bb1-b671-ac88a9e3824f
+# ╟─8f9db9b5-43b8-4d8a-910b-f09cd405c0b4
+# ╠═73d77c9a-65b2-4fd2-a154-4cfc6693f370
+# ╠═03f692be-4a1a-4761-bf06-937389f367b8
+# ╟─14b4b7e0-fd6e-4053-af9c-63a7ead640a0
+# ╠═3ebaaa57-198d-4255-8404-616b4b02af3c
+# ╠═d623d381-9704-442a-b5ef-a5394ce90739
+# ╟─9ff747b6-2545-4027-a0be-655f25167d66
+# ╠═5ca1cfd9-505a-4ba9-888d-24513c9f3090
+# ╠═0c5bd9b0-f1d5-4cee-b031-fdc9d6ebdc8c
