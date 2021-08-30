@@ -269,10 +269,10 @@ To get the avergage background intensity we need to calculate the number of pixe
 
 # ╔═╡ 25a757fa-d4f3-4198-9471-0c4eaeefeb0d
 begin
-	vol_half_square = (128 * 128) * 2				# length * width * 2
-	vol_half_circle = ((π * (128/2)^2) / 2) * 2 	# π * radius^2 / 2 * 2
+	vol_half_square = (256 * 128) * 2				# length * width * 2
+	vol_half_circle = ((π * (128)^2) / 2) * 2 	# π * radius^2 / 2 * 2
 	vol_air = vol_half_square - vol_half_circle 	# half square - half circle
-	vol_fat = (128 * 128) * 2 						# length * width * 2
+	vol_fat = (256 * 128) * 2 						# length * width * 2
 end
 
 # ╔═╡ 1d1aaaca-862c-4df3-a92d-54eb6649f4e3
