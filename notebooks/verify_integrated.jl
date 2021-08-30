@@ -24,8 +24,6 @@ begin
 				"CairoMakie"
 				"ImageFiltering"
 				"DataFrames"
-				"TestImages"
-				"Images"
 				])
 		Pkg.add(url="https://github.com/Dale-Black/ActiveContours.jl")
 		Pkg.add(url="https://github.com/Dale-Black/CalciumScoring.jl")
@@ -35,8 +33,6 @@ begin
 	using CairoMakie
 	using ImageFiltering
 	using DataFrames
-	using TestImages
-	using Images
 	using ActiveContours
 	using CalciumScoring # contains Integrated code
 end
