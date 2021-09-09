@@ -194,7 +194,7 @@ cp_new = cp[cp .> -160] # arbitrary but gives a decent looking normal distributi
 hist(cp_new; bins=100)
 
 # ╔═╡ 70bda50a-b94a-4a30-9d3e-226681edaa2b
-thresh_new = mean(cp_new) - 0.75 * std(cp_new)
+thresh_new = mean(cp_new) - 1 * std(cp_new)
 
 # ╔═╡ faeca5ba-d327-40ab-b408-34e7bfe6bb52
 begin
@@ -246,7 +246,7 @@ cp2 = img_array[core]
 hist(cp2, bins=100)
 
 # ╔═╡ 0dd64da1-9b85-4770-8be5-c91b0a8db720
-thresh2 = mean(cp2) - 0.75 * std(cp2)
+thresh2 = mean(cp2) - 1 * std(cp2)
 
 # ╔═╡ 55738453-4f82-472d-988e-98c8b91a3453
 begin
@@ -296,6 +296,9 @@ end
 
 # ╔═╡ fc6f8cfa-4d6a-4692-9073-82c9ccd7ff94
 @bind c PlutoUI.Slider(1:size(thresh_core_vol)[3]; default=215, show_value=true)
+
+# ╔═╡ 9a46e7b8-624e-482a-92d8-5d89ac5ea042
+heatmap(vol[:, :, c])
 
 # ╔═╡ d02991e8-8fd1-4183-bd75-81c7baf590e6
 heatmap(thresh_core_vol[:, :, c])
@@ -402,6 +405,7 @@ mass = (π * (2.5)^2) * 7 * ρ_mm * 4 # (area) * (length) * (density)
 # ╠═6f2d3ac7-3bdb-4cf7-8191-88da59fbf1c6
 # ╠═aa101d21-aff7-42c4-bba5-532a4d821bf7
 # ╟─fc6f8cfa-4d6a-4692-9073-82c9ccd7ff94
+# ╠═9a46e7b8-624e-482a-92d8-5d89ac5ea042
 # ╠═d02991e8-8fd1-4183-bd75-81c7baf590e6
 # ╠═2bfd9e02-8763-491d-803b-23e83d9b2372
 # ╠═af9687e9-b91b-41a0-a363-e26505100ba9
