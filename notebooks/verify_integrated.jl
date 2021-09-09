@@ -315,9 +315,7 @@ Calculate the predicted mass that corresponds to calcium, versus the true mass t
 """
 
 # ╔═╡ 5ca1cfd9-505a-4ba9-888d-24513c9f3090
-begin
-	pred_mass = score(S_Bkg_avg, S_Obj_avg, voxel_size, ρ, alg5)
-end
+pred_mass = score(S_Bkg_avg, S_Obj_avg, voxel_size, ρ, alg5)
 
 # ╔═╡ 0c5bd9b0-f1d5-4cee-b031-fdc9d6ebdc8c
 true_mass = ρ * true_vol

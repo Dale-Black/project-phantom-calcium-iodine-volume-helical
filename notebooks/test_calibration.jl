@@ -151,6 +151,8 @@ First, segment out the ring that will used for the background measurement. Use t
 # ╔═╡ c5713f81-881d-4058-82ac-211534c4560d
 begin
 	ring = Bool.((dilate(dilate(dilate(dilate(dilate(lbl_array)))))) - dilate(dilate(dilate(dilate(lbl_array)))))
+	
+	# For visualization
 	idxs = findall(x -> x == 1, ring)
 	ring_img = fill(-1024, size(lbl_array))
 	ring_img[idxs] .= copy(img_array[idxs])
@@ -176,7 +178,7 @@ hist(cp; bins=100)
 thresh_old = mean(cp) - std(cp)
 
 # ╔═╡ 16873eef-7fd0-4b4c-adc5-5ca692ac42d4
-StatsBase.percentile(cp, 1.0) # investigate this
+StatsBase.percentile(cp, 0.05) # investigate this
 
 # ╔═╡ 17624dda-b1eb-467d-8f76-fa4fdaf07187
 md"""
@@ -192,7 +194,7 @@ cp_new = cp[cp .> -160] # arbitrary but gives a decent looking normal distributi
 hist(cp_new; bins=100)
 
 # ╔═╡ 70bda50a-b94a-4a30-9d3e-226681edaa2b
-thresh_new = mean(cp_new) - 0.5 * std(cp_new)
+thresh_new = mean(cp_new) - 0.75 * std(cp_new)
 
 # ╔═╡ faeca5ba-d327-40ab-b408-34e7bfe6bb52
 begin
@@ -231,7 +233,7 @@ We will take the same approach as above and threshold using histograms as guides
 
 # ╔═╡ e1c67fb5-c71e-4cfa-9e3d-4c0601d9c352
 begin
-	core = Bool.(erode(erode(lbl_array)))
+	core = Bool.(erode((lbl_array)))
 	idxs3 = findall(x -> x == 1, core)
 	core_img = fill(-1024, size(lbl_array))
 	core_img[idxs3] .= copy(img_array[idxs3])
@@ -244,7 +246,7 @@ cp2 = img_array[core]
 hist(cp2, bins=100)
 
 # ╔═╡ 0dd64da1-9b85-4770-8be5-c91b0a8db720
-thresh2 = mean(cp2) - 0.5 * std(cp2)
+thresh2 = mean(cp2) - 0.75 * std(cp2)
 
 # ╔═╡ 55738453-4f82-472d-988e-98c8b91a3453
 begin
@@ -343,7 +345,7 @@ md"""
 """
 
 # ╔═╡ 79aaca51-7bf3-4902-987c-4cb52a61ebf5
-mass = (π * (2.5)^2) * 7 * ρ_mm # (area) * (length) * (density)
+mass = (π * (2.5)^2) * 7 * ρ_mm * 4 # (area) * (length) * (density)
 
 # ╔═╡ Cell order:
 # ╠═3ad36990-0046-11ec-237b-1700383703a5
@@ -362,7 +364,7 @@ mass = (π * (2.5)^2) * 7 * ρ_mm # (area) * (length) * (density)
 # ╠═7f847303-7306-4580-ad22-2c7591525bf9
 # ╠═67dcd624-604f-4b75-9cfe-f80a41126e3e
 # ╠═76eb2b56-528b-49f1-a2ce-b3988f879287
-# ╠═97f3208d-425c-4434-9d1f-3f86272dcb01
+# ╟─97f3208d-425c-4434-9d1f-3f86272dcb01
 # ╠═edde14ca-1073-4cc4-aac4-3bc1a1b4cb98
 # ╟─b43b1e2d-9851-439b-a964-03390ec020f2
 # ╟─e06cf7f0-39ce-4918-98c0-4fdfac6e8e6f
@@ -381,7 +383,7 @@ mass = (π * (2.5)^2) * 7 * ρ_mm # (area) * (length) * (density)
 # ╠═faeca5ba-d327-40ab-b408-34e7bfe6bb52
 # ╟─5b5b0cfb-69e2-453d-a423-b87224e4b9e9
 # ╟─a6861a61-1634-40f6-83a6-016b0a1166d5
-# ╠═a718590c-1b2f-4ced-afe9-ef7edc52a96c
+# ╟─a718590c-1b2f-4ced-afe9-ef7edc52a96c
 # ╠═61d3ad2e-3073-42b9-8bd1-8620663f490b
 # ╠═95b94948-1c60-4d74-9c5e-da6b2d3929fa
 # ╟─475e2ae9-15ab-438f-950d-1dd6a6f0fd69
