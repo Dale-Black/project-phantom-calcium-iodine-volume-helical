@@ -175,10 +175,10 @@ The histogram below is showing all the values of the voxels contained within the
 hist(cp; bins=100)
 
 # ╔═╡ df55c0ad-f712-4961-963b-6f406b8f0d69
-thresh_old = mean(cp) - std(cp)
+# thresh_old = mean(cp) - std(cp)
 
 # ╔═╡ 16873eef-7fd0-4b4c-adc5-5ca692ac42d4
-StatsBase.percentile(cp, 0.05) # investigate this
+# StatsBase.percentile(cp, 0.05) # investigate this
 
 # ╔═╡ 17624dda-b1eb-467d-8f76-fa4fdaf07187
 md"""
@@ -245,8 +245,14 @@ cp2 = img_array[core]
 # ╔═╡ c7e24f1f-9e22-4b3b-8a52-e79dbebab2b9
 hist(cp2, bins=100)
 
+# ╔═╡ 33a54d3f-6ff8-4884-a086-ac270113121c
+cp_new2 = cp2[cp2 .> -160] # arbitrary but gives a decent looking normal distribution
+
+# ╔═╡ 46795f21-3a08-4da1-bf93-bfbc43ca2dbf
+hist(cp_new2, bins=100)
+
 # ╔═╡ 0dd64da1-9b85-4770-8be5-c91b0a8db720
-thresh2 = mean(cp2) - 1 * std(cp2)
+thresh2 = mean(cp_new2) - 1 * std(cp_new2)
 
 # ╔═╡ 55738453-4f82-472d-988e-98c8b91a3453
 begin
@@ -288,7 +294,7 @@ end
 
 # ╔═╡ aa101d21-aff7-42c4-bba5-532a4d821bf7
 begin
-	thresh_new_vol = mask_elements(vol, thresh_new, 3) # use S_Bkg threshold
+	thresh_new_vol = mask_elements(vol, thresh_new_core, 3) # use S_Bkg threshold
 	idxs6 = findall(x -> x == 1, thresh_new_vol)
 	thresh_core_vol = fill(-1024, size(lbl_array))
 	thresh_core_vol[idxs6] .= copy(vol[idxs6])
@@ -394,6 +400,8 @@ mass = (π * (2.5)^2) * 7 * ρ_mm * 4 # (area) * (length) * (density)
 # ╠═e1c67fb5-c71e-4cfa-9e3d-4c0601d9c352
 # ╠═8fa9b4c0-8870-4b11-92ac-b3e74e1736ca
 # ╠═c7e24f1f-9e22-4b3b-8a52-e79dbebab2b9
+# ╠═33a54d3f-6ff8-4884-a086-ac270113121c
+# ╠═46795f21-3a08-4da1-bf93-bfbc43ca2dbf
 # ╠═0dd64da1-9b85-4770-8be5-c91b0a8db720
 # ╠═55738453-4f82-472d-988e-98c8b91a3453
 # ╟─41da1d08-1d5e-4256-980d-cfcbfb4e1e17
