@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.15.1
+# v0.16.0
 
 using Markdown
 using InteractiveUtils
@@ -29,6 +29,7 @@ begin
 				"DataFrames"
 				"CSV"
 				"StatsBase"
+				"Statistics"
 				])
 		Pkg.add([
 				Pkg.PackageSpec(url="https://github.com/JuliaNeuroscience/NIfTI.jl")
@@ -52,6 +53,7 @@ begin
 	using CSV
 	using StatsBase
 	using CalciumScoring
+	using Statistics
 end
 
 # ╔═╡ ef22a2cb-1d13-4de6-a10b-a44c915f0847
@@ -166,6 +168,12 @@ Now let's use the original `ring` segmentation (which includes only air, backgro
 # ╔═╡ d5544765-491c-4faa-a0c3-60d6c3fd5e0d
 cp = img_array[ring]
 
+# ╔═╡ 4ba8a779-41bd-4f4e-9f2f-b75141005450
+cp_test = cp[cp .> -500]
+
+# ╔═╡ 3daf37e3-4e98-4d74-afb0-5c2604d73a55
+left1 = quantile!(cp, 0.1)
+
 # ╔═╡ 71c683db-d7ab-43bb-bcb5-422fb9b3a466
 md"""
 The histogram below is showing all the values of the voxels contained within the ring. I would like to find a more exact approach to turn this into a normal distribution by thresholding out the x-percentile values but that doesn't work using `StatsBase.percentile`
@@ -241,6 +249,9 @@ end
 
 # ╔═╡ 8fa9b4c0-8870-4b11-92ac-b3e74e1736ca
 cp2 = img_array[core]
+
+# ╔═╡ a7f34859-6aff-4b27-8909-daecae1d5b0b
+left2 = quantile!(cp2, 0.1)
 
 # ╔═╡ c7e24f1f-9e22-4b3b-8a52-e79dbebab2b9
 hist(cp2, bins=100)
@@ -381,6 +392,8 @@ mass = (π * (2.5)^2) * 7 * ρ_mm * 4 # (area) * (length) * (density)
 # ╠═c5713f81-881d-4058-82ac-211534c4560d
 # ╟─bee114ab-fe3d-422a-9934-2c6192d7d115
 # ╠═d5544765-491c-4faa-a0c3-60d6c3fd5e0d
+# ╠═4ba8a779-41bd-4f4e-9f2f-b75141005450
+# ╠═3daf37e3-4e98-4d74-afb0-5c2604d73a55
 # ╟─71c683db-d7ab-43bb-bcb5-422fb9b3a466
 # ╠═8ae10475-302d-46e1-ae00-59a74e125e6f
 # ╠═df55c0ad-f712-4961-963b-6f406b8f0d69
@@ -399,6 +412,7 @@ mass = (π * (2.5)^2) * 7 * ρ_mm * 4 # (area) * (length) * (density)
 # ╟─1a871074-2965-45bb-8a57-1bd0b66170bf
 # ╠═e1c67fb5-c71e-4cfa-9e3d-4c0601d9c352
 # ╠═8fa9b4c0-8870-4b11-92ac-b3e74e1736ca
+# ╠═a7f34859-6aff-4b27-8909-daecae1d5b0b
 # ╠═c7e24f1f-9e22-4b3b-8a52-e79dbebab2b9
 # ╠═33a54d3f-6ff8-4884-a086-ac270113121c
 # ╠═46795f21-3a08-4da1-bf93-bfbc43ca2dbf
